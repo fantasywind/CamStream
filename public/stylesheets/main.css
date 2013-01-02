@@ -1,0 +1,17 @@
+body {
+	background: #DDD;
+}
+div#main-container {
+	max-width: 996px;
+	margin: 0 auto;
+}
+div#viewer {
+	border: 1px solid #333;
+	padding: 12px;
+	min-height: 550px;
+}
+div#map {
+	width: 290px;
+	height: 290px;
+	margin:	15px 5px;  
+}
