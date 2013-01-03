@@ -4,5 +4,10 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Cga Cam Stream System' });
+	console.dir(req.session)
+	if (!req.session.role){
+		res.render('login', {statusText: 'Login'});
+	} else {
+		res.render('index', { title: 'Cga Cam Stream System' });
+	}
 };

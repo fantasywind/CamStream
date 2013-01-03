@@ -10,8 +10,23 @@ div#viewer {
 	padding: 12px;
 	min-height: 550px;
 }
-div#map {
+div#map-container {
 	width: 290px;
 	height: 290px;
-	margin:	15px 5px;  
+	margin:	14px 12px;  
+	border: 1px solid #CCC;
+}
+#available-token .btn-danger {
+	display:none;
+}
+.pass-code {
+	font-size: 5em;
+	margin: 50px;
+	text-align: center;
+	font-weight: bold;
+	letter-spacing: 0.3em;  
+}
+.expired-date-text {
+	text-align: right;
+	color: red;  
 }

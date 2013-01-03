@@ -1,0 +1,37 @@
+doctype 5
+html
+	head
+		title Cga Cam Stream System
+		script(src='/javascripts/libs/jquery-1.8.3.min.js')
+		script(src='/javascripts/libs/bootstrap.min.js')
+		link(rel='stylesheet', href='/stylesheets/bootstrap-responsive.min.css')
+		link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+		link(rel='stylesheet', href='/stylesheets/login.css')
+	body
+		div#main-container
+			header.row-fluid
+				div.span12
+					h1 Cga Cam Stream
+			div.row-fluid
+				div.span12
+					h4 登入系統
+					form.form-horizontal(method='post', action='/login')
+						div.control-group
+							label.control-label(for='username') 帳號
+							div.controls
+								input#username(type='text', name='username', placeholder='Username')
+								if statusText == "UsernameUnknown"
+									p.control-helper 未知的帳號
+						div.control-group
+							label.control-label(for='password') 密碼
+							div.controls
+								input#password(type='password', name='password', placeholder='Password')
+								if statusText == "PasswordWrong"
+									p.control-helper 密碼錯誤
+						div.control-group
+							button.btn.btn-primary(type='submit').pull-right
+								i.icon-off.icon-white
+								|  登入
+			footer.row-fluid
+				div.span12
+					h6(style='text-align:center;') Copyright Cga
