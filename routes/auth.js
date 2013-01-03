@@ -63,26 +63,37 @@ function deleteToken(req, res){
 		});
 	}
 }
-					
 
+/* Auto Unset Timeout Token */
+function autoUnsetToken(code){
+    var timeout = function(){
+        sqlConn.query("DELETE FROM `token` WHERE `pass_code` = ?", code, function (err, rows, field) {
+            console.log('Auto unset: ' + code);
+            return; 
+        });
+    };
+    setTimeout(timeout, 15 * 60000);
+}
+
+/* Add New Token */
 function codeUnique(code, req, res){
 	sqlConn.query("SELECT COUNT(*) FROM `token` WHERE `pass_code` = ?", code, function (err, rows, field){
 		if (rows[0]['COUNT(*)'] == 0){
 			var token = crypto.createHash('md5').update(code + hashSalt).digest('hex');
-			var sql = "INSERT INTO `token` (`token`, `create_time`, `expired`, `maker_id`, `pass_code`) VALUES ('";
-				sql += token + "', NOW(), DATE_ADD(NOW(), INTERVAL + 14 DAY), " + req.session.uid + ", " + code + ")";
+			var sql = "INSERT INTO `token` (`token`, `create_time`, `maker_id`, `pass_code`) VALUES ('";
+				sql += token + "', NOW(), " + req.session.uid + ", " + code + ")";
 			sqlConn.query(sql, function (err, rows, field){
-				if (err) throw err;
-				var today = new Date().getTime() + (14 * 60 * 60 * 24 * 1000);
-				var expired = new Date(today);
-				var result = {
-					status: 'success',
-					pass_code: code,
-					today: today,
-					expired: expired,
-					device: ''
-				};
-				res.json(result);
+
+			    // Auto Unset
+			    autoUnsetToken(code);
+
+			    if (err) throw err;
+			    var result = {
+			    	status: 'success',
+			    	pass_code: code,
+			    	device: ''
+			    };
+			    res.json(result);
 			});
 		} else {
 			codeUnique(makeCode(), req, res);
@@ -122,10 +133,8 @@ exports.login = function(req, res){
 				var hashed = crypto.createHash('md5').update(req.body.password).digest('hex');
 				var plusSalt = crypto.createHash('md5').update(hashed + result.salt).digest('hex');
 				if (plusSalt == result.password){
-					console.dir(result)
 					req.session.role = result.role;
 					req.session.uid = result.id;
-					console.dir(req.session)
 					res.redirect('/');
 				} else
 				    res.render('login', {statusText: 'PasswordWrong'});
