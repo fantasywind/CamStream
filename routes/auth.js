@@ -12,9 +12,27 @@ var sqlConn = mysql.createConnection({
 	database: 'cga_cam_stream'
 });
 var hashSalt = 'aEh%ew3#@as16';
+var dep = {0: {name: '未指定', master: null}};
 
 try {
 	sqlConn.connect();
+} catch (e) {
+	console.dir(e);
+}
+
+/* Cache Department Data */
+try {
+	sqlConn.query("SELECT * FROM `department`", function (err, rows, fields) {
+		if (err) throw err;
+		for (var i in rows) {
+			var tmp = {};
+			tmp.name = rows[i].name;
+			tmp.master = rows[i].master_id;
+			dep[rows[i].dep_id] = tmp;
+		}
+		console.log('Cache Department Code:');
+		console.dir(dep);
+	});
 } catch (e) {
 	console.dir(e);
 }
@@ -26,12 +44,14 @@ function getTokens(req, res){
 			for (var i in rows){
 				users[rows[i].id] = rows[i].realname;  
 			}
-			sqlConn.query("SELECT `device`, `expired`, `maker_id`, `pass_code` FROM `token` ORDER BY `expired` DESC", function (err, rows, fields){
+			sqlConn.query("SELECT `device`, `expired`, `maker_id`, `pass_code`, `dep_id` FROM `token` ORDER BY `expired` DESC", function (err, rows, fields){
 				if (err) throw err;
 				var tokens = [];
 				for (var i in rows){
 					var tmp = {};
 					tmp.maker = users[rows[i].maker_id];
+					tmp.dep_id = rows[i].dep_id;
+					tmp.dep = dep[tmp.dep_id];
 					tmp.pass_code = rows[i].pass_code;
 					tmp.expired = rows[i].expired;
 					tmp.device = rows[i].device;
@@ -67,7 +87,7 @@ function deleteToken(req, res){
 /* Auto Unset Timeout Token */
 function autoUnsetToken(code){
     var timeout = function(){
-        sqlConn.query("DELETE FROM `token` WHERE `pass_code` = ?", code, function (err, rows, field) {
+        sqlConn.query("DELETE FROM `token` WHERE `expired` is null AND `pass_code` = ?", code, function (err, rows, field) {
             console.log('Auto unset: ' + code);
             return; 
         });
@@ -103,6 +123,43 @@ function codeUnique(code, req, res){
 
 function makeCode(){
 	return Math.floor(Math.random() * 1000000 + 1);  
+}
+
+function write_device_data (token, req, res) {
+	var device = req.params.device,
+	    pass_code = req.params.pc;
+	sqlConn.query("UPDATE `token` SET `expired` = DATE_ADD(now(), INTERVAL 30 DAY), `device` = ? WHERE `pass_code` = ?", [device, pass_code], function (err, rows, field) {
+		if (err) throw err;
+		var result = {};
+		result.status = 'Success';
+		result.token = token;
+		res.json(result);
+	});
+}
+
+function add_device(req, res){
+	var pass_code = req.params.pc;
+	try {
+		sqlConn.query("SELECT `token` FROM `token` WHERE `expired` is null AND `pass_code` = ?", pass_code, function (err, rows, field) {
+			if (err) throw err;
+			var result = {};
+			if (rows.length){
+				var token = rows[0].token;
+				write_device_data(token, req, res);
+			} else {
+				result.status = 'Uncatched Pass';
+				res.json(result);
+			}
+});
+	} catch (e) {
+		console.dir(e);
+	}
+}
+
+/* Module Public Functions */
+
+exports.newDevice = function(req, res){
+	add_device(req, res);
 }
 
 exports.deleteToken = function(req, res){

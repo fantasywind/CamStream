@@ -50,7 +50,7 @@ $(function () {
 		var tokenContainer = $("#available-token");
 		tokenContainer.text("讀取憑證中...");
 		$("#add-token").removeClass('disabled');
-		var tokenTable = "<table class='table'><thead><tr><th>建立者</th><th>通行碼</th><th>裝置</th><th>到期日</th><th width='70px'></th></tr></thead><tbody>";
+		var tokenTable = "<table class='table'><thead><tr><th>通行碼</th><th>裝置</th><th>單位</th><th>到期日</th><th width='70px'></th></tr></thead><tbody>";
 		$.getJSON('/auth', {}, function(json){
 			var today = new Date();
 			for (var i in json){
@@ -62,7 +62,7 @@ $(function () {
                                 var className = 'info';
                             }
                             var device = json[i].device != '' ? json[i].device : '未連接裝置';
-			    tokenTable += "<tr pass-code='" + json[i].pass_code + "' class='" + className + "'><td>" + json[i].maker + "</td><td>" + json[i].pass_code + "</td><td>" + device +  "</td><td>" + expired + "</td>";
+			    tokenTable += "<tr pass-code='" + json[i].pass_code + "' class='" + className + "'><td>" + json[i].pass_code + "</td><td>" + device +  "</td><td>" + json[i].dep.name +  "</td><td>" + expired + "</td>";
 			    tokenTable += "<td><button class='btn btn-danger btn-mini'><i class='icon-white icon-remove'></i> 刪除</button></td></tr>";	
 			}
 			tokenTable += "</tbody></table>";

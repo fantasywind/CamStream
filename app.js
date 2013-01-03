@@ -12,7 +12,7 @@ var express = require('express')
 var app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.env.PORT || 3615);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.cookieParser('cga361520@orz'));
@@ -31,6 +31,7 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.post('/login', auth.login);
+app.patch('/auth/:pc/:device', auth.newDevice);
 app.del('/auth/:pc', auth.deleteToken);
 app.get('/logout', auth.logout);
 app.get('/auth/new', auth.newToken);
