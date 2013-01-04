@@ -5,9 +5,25 @@ $(function () {
 		zoom: 16,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	},
-	mapContainer = $("#map-container");
+	mapContainer = $("#map-container"),
 	//map = new google.maps.Map(mapContainer[0], options);
+	listenPassCode = function (passCode) {
+		if (!passCode) {
+			return;
+		}
 
+		var listener = function () {
+			$.getJSON('/auth/listen/' + passCode, {}, function (json) {
+				if (json.status == 'stay') {
+					listener();
+				} else if (json.status == 'success') {
+					alert('連接成功!');
+				}
+			});
+		};
+		listener();
+	};
+	
 	$("#available-token").delegate('td', 'hover', function (e) {
 		var $this = $(this);
 		if (e.type === 'mouseenter') {
@@ -84,6 +100,7 @@ $(function () {
 				    var helper = $("<p>").text('通關號碼：');
 				    var helper2 = $("<p>").addClass('expired-date-text').text("有效期：15 mins");
 				    $container.empty().append(helper).append(token).append(helper2);
+				    listenPassCode(json.pass_code);
 				} else {
 				    $container.html('<p>無法取得新憑證，請聯絡系統管理員或稍候再嘗試。</p>');
 				}

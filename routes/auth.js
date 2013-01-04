@@ -13,6 +13,7 @@ var sqlConn = mysql.createConnection({
 });
 var hashSalt = 'aEh%ew3#@as16';
 var dep = {0: {name: '未指定', master: null}};
+var listen = {};
 
 try {
 	sqlConn.connect();
@@ -130,6 +131,11 @@ function write_device_data (token, req, res) {
 	    pass_code = req.params.pc;
 	sqlConn.query("UPDATE `token` SET `expired` = DATE_ADD(now(), INTERVAL 30 DAY), `device` = ? WHERE `pass_code` = ?", [device, pass_code], function (err, rows, field) {
 		if (err) throw err;
+		/* Callback Web Client Listening */
+		if (typeof listen[pass_code] === 'function') {
+			listen[pass_code](device);
+		}
+
 		var result = {};
 		result.status = 'Success';
 		result.token = token;
@@ -158,12 +164,40 @@ function add_device(req, res){
 
 /* Module Public Functions */
 
-exports.newDevice = function(req, res){
+exports.listen = function (req, res) {
+	var passCode = req.params.pc,
+	    returnFn = function (req, res) {
+		return function (device) {
+			console.log('return Fn, device: ' + device );
+		    if (device) {
+		    	res.json({
+		    	    status: 'success',
+			    passCode: passCode,
+			    device: device
+			});
+		    } else {
+			res.json({
+			    status: 'stay',
+			    passCode: passCode
+			});
+		    }
+		};
+	    },
+	    timeout = function () {
+		listen[passCode]();
+		delete listen[passCode];
+	    };
+
+	listen[passCode] = returnFn(req, res);
+	setTimeout( timeout, 30000 );
+}
+
+exports.newDevice = function (req, res) {
 	add_device(req, res);
 }
 
-exports.deleteToken = function(req, res){
-	if (req.session.role == 'admin'){
+exports.deleteToken = function (req, res) {
+	if (req.session.role == 'admin') {
 		deleteToken(req, res);
 	} else {
 		res.writeHead(401);
@@ -171,8 +205,8 @@ exports.deleteToken = function(req, res){
 	}
 }
 
-exports.newToken = function(req, res){
-	if (req.session.role != 'admin'){
+exports.newToken = function (req, res) {
+	if (req.session.role != 'admin') {
 		res.writeHead(401);
 		res.end();
 	} else {
@@ -180,10 +214,11 @@ exports.newToken = function(req, res){
 	}
 }
 
-exports.login = function(req, res){
-	if (req.session.role)
+exports.login = function (req, res) {
+	if (req.session.role) {
 		res.redirect('/');
-	if (req.body.username && req.body.password){
+	}
+	if (req.body.username && req.body.password) {
 		sqlConn.query("SELECT * FROM `user` WHERE `username` = ?", req.body.username, function (err, rows, field) {
 			var result = rows[0];
 			if (result){
@@ -202,20 +237,19 @@ exports.login = function(req, res){
 		render('login', {statusText: 'Login'});
 }
 
-exports.logout = function(req, res){
+exports.logout = function (req, res) {
 	delete req.session.role
 	res.redirect('/');
 }
 
-exports.get = function(req, res){
-	if (req.session.role == 'admin'){
+exports.get = function (req, res) {
+	if (req.session.role == 'admin') {
 		var result = getTokens(req, res);
 	} else {
 		var result = {
 			status: 'unavailable',
 			test: 'Yoo'
 		};
-		res.setHeader('Content-Type', 'application/json');
-		res.end(JSON.stringify(result));
+		res.json(result);
 	}
 };

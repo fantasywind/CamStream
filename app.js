@@ -34,6 +34,7 @@ app.post('/login', auth.login);
 app.patch('/auth/:pc/:device', auth.newDevice);
 app.del('/auth/:pc', auth.deleteToken);
 app.get('/logout', auth.logout);
+app.get('/auth/listen/:pc', auth.listen);
 app.get('/auth/new', auth.newToken);
 app.get('/auth', auth.get);
 app.get('/users', user.list);
