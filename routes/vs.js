@@ -13,7 +13,7 @@ vs = net.createServer( function(conn) {
   });
 
   conn.on("data", function (data) {
-    console.log('Data: ' + typeof data);
+    console.log('On data.');
     stream.write(data);
   });
 
