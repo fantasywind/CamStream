@@ -247,8 +247,7 @@ exports.get = function (req, res) {
 		var result = getTokens(req, res);
 	} else {
 		var result = {
-			status: 'unavailable',
-			test: 'Yoo'
+			status: 'available'
 		};
 		res.json(result);
 	}

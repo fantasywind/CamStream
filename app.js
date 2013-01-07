@@ -7,6 +7,7 @@ var express = require('express')
   , routes = require('./routes')
   , auth = require('./routes/auth')
   , user = require('./routes/user')
+  , vs = require('./routes/vs')
   , http = require('http')
   , path = require('path')
 var app = express();
