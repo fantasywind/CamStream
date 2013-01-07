@@ -7,6 +7,9 @@ $(function () {
 	},
 	mapContainer = $("#map-container"),
 	//map = new google.maps.Map(mapContainer[0], options);
+  
+
+  //  監聽認證要求
 	listenPassCode = function (passCode) {
 		if (!passCode) {
 			return;
@@ -24,6 +27,7 @@ $(function () {
 		listener();
 	};
 	
+  //  移入顯示刪除鍵
 	$("#available-token").delegate('td', 'hover', function (e) {
 		var $this = $(this);
 		if (e.type === 'mouseenter') {
@@ -33,6 +37,7 @@ $(function () {
 		}
 	});
 
+  //  刪除確認
 	$("#available-token").delegate('.btn-danger', 'click', function (e) {
 		var $this = $(this),
 		    tmp;
@@ -62,6 +67,7 @@ $(function () {
 		}
 	});
 
+  //  取得憑證清單
 	$("#add-source-open").click(function(){
 		var tokenContainer = $("#available-token");
 		tokenContainer.text("讀取憑證中...");
@@ -88,6 +94,7 @@ $(function () {
 		$("#new-token-container").empty();
 	});
 	
+  //  新增憑證
 	$("#add-token").click(function(){
 		var $this = $(this),
 			$container = $("#new-token-container");
@@ -107,4 +114,10 @@ $(function () {
 			})
 		}
 	});
+
+  //  初始化播放器
+  jwplayer("p1").setup({
+    file: "./v/1",
+    type: "mp4"
+  });
 });

@@ -146,11 +146,13 @@ function write_device_data (token, req, res) {
 function add_device(req, res){
 	var pass_code = req.params.pc;
 	try {
-		sqlConn.query("SELECT `token` FROM `token` WHERE `expired` is null AND `pass_code` = ?", pass_code, function (err, rows, field) {
+		sqlConn.query("SELECT `token`, `id` FROM `token` WHERE `expired` is null AND `pass_code` = ?", pass_code, function (err, rows, field) {
 			if (err) throw err;
 			var result = {};
 			if (rows.length){
 				var token = rows[0].token;
+
+        req.session.token_id = rows[0].id;
 				write_device_data(token, req, res);
 			} else {
 				result.status = 'Uncatched Pass';
@@ -176,8 +178,7 @@ exports.listen = function (req, res) {
 			    device: device
 			});
 		    } else {
-			res.json({
-			    status: 'stay',
+			res.jsget			    status: 'stay',
 			    passCode: passCode
 			});
 		    }

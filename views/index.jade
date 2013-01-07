@@ -1,54 +1,56 @@
 doctype 5
 html
-	head
-		title= title
-		script(src='/javascripts/libs/jquery-1.8.3.min.js')
-		script(src='/javascripts/libs/bootstrap.min.js')
-		script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAy2cfNA78sOi9DF0XZOgc7BrTYTTX5y1s&sensor=true')
-		script(src='/javascripts/main.js')
-		link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
-		link(rel='stylesheet', href='/stylesheets/main.css')
-	body
-		div#main-container
-			header.row-fluid
-				div.span12
-					h1 Cga Cam Stream System
-			div.row-fluid
-				div.span12
-					h5 請選擇視訊來源:
-					div#source-selector.btn-toolbar
-						div.btn-group(data-toggle='buttons-checkbox')
-							button.btn(type='button') 
-								i.icon-facetime-video
-								|  Cam1
-							button.btn(type='button')
-								i.icon-facetime-video
-								|  Cam2
-							button.btn(type='button')
-								i.icon-facetime-video
-								|  Cam3
-			div.row-fluid
-				div#viewer.span8
-				div.span4
-					div#sidebar
-						a#add-source-open.btn.btn-primary.btn-block(data-toggle='modal', href='#add-source', role='button')
-							i.icon-plus.icon-white
-							|  新增來源
-						a.btn.btn-block
-							i.icon-film
-							|  影片資料庫
-						div#map-tracer
-							div#map-container
-			footer.row-fluid
-			div#add-source.modal.hide.fade(tabindex='-1', role='dialog', aria-hidden='true')
-				div.modal-header
-					button.close(type='button', data-dismiss='modal', aria-hidden='true')
-					h3#add-source-title 新增影像來源
-				div.modal-body
-					button#add-token.btn.btn-primary(type='button')
-						i.icon-plus.icon-white
-						|  新增憑證
-					div#new-token-container
-					div#available-token
-				div.modal-footer
-					button.btn(data-dismiss='modal', aria-hidden='true') 確定
+  head
+    title= title
+    script(src='/javascripts/libs/jquery-1.8.3.min.js')
+    script(src='/javascripts/libs/bootstrap.min.js')
+    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAy2cfNA78sOi9DF0XZOgc7BrTYTTX5y1s&sensor=true')
+    script(src='jwplayer/jwplayer.js')
+    script(src='/javascripts/main.js')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/main.css')
+  body
+    div#main-container
+      header.row-fluid
+        div.span12
+          h1 Cga Cam Stream System
+      div.row-fluid
+        div.span12
+          h5 請選擇視訊來源:
+          div#source-selector.btn-toolbar
+            div.btn-group(data-toggle='buttons-checkbox')
+              button.btn(type='button') 
+                i.icon-facetime-video
+                |  Cam1
+              button.btn(type='button')
+                i.icon-facetime-video
+                |  Cam2
+              button.btn(type='button')
+                i.icon-facetime-video
+                |  Cam3
+      div.row-fluid
+        div#viewer.span8
+          div#p1.player
+        div.span4
+          div#sidebar
+            a#add-source-open.btn.btn-primary.btn-block(data-toggle='modal', href='#add-source', role='button')
+              i.icon-plus.icon-white
+              |  新增來源
+            a.btn.btn-block
+              i.icon-film
+              |  影片資料庫
+            div#map-tracer
+              div#map-container
+      footer.row-fluid
+      div#add-source.modal.hide.fade(tabindex='-1', role='dialog', aria-hidden='true')
+        div.modal-header
+          button.close(type='button', data-dismiss='modal', aria-hidden='true')
+          h3#add-source-title 新增影像來源
+        div.modal-body
+          button#add-token.btn.btn-primary(type='button')
+            i.icon-plus.icon-white
+            |  新增憑證
+          div#new-token-container
+          div#available-token
+        div.modal-footer
+          button.btn(data-dismiss='modal', aria-hidden='true') 確定
