@@ -17,17 +17,9 @@ html
       div.row-fluid
         div.span12
           h5 請選擇視訊來源:
-          div#source-selector.btn-toolbar
-            div.btn-group(data-toggle='buttons-checkbox')
-              button.btn(type='button') 
-                i.icon-facetime-video
-                |  Cam1
-              button.btn(type='button')
-                i.icon-facetime-video
-                |  Cam2
-              button.btn(type='button')
-                i.icon-facetime-video
-                |  Cam3
+          div.btn-toolbar
+            div#source-selector.btn-group(data-toggle='buttons-checkbox')
+              h6 目前無可用直播來源
       div.row-fluid
         div#viewer.span8
           div#p1.player

@@ -1,0 +1,32 @@
+doctype5
+html
+  head
+    title 測試系統頁
+    script(src='/javascripts/libs/jquery-1.8.3.min.js')                                                                   
+    script(src='/javascripts/libs/bootstrap.min.js')
+    script(src='/javascripts/test.js')
+    link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/test.css')
+  body
+    div#main-container.row-fluid(style='background:#DDD')
+      h1.span12 測試系統
+      div.span12
+        label 選擇裝置
+        select#device-selector
+          each device, i in devices
+            option(value=devices[i].id, token=devices[i].token) #{devices[i].device}
+        div.btn-group
+          button#register.btn 綁定手機
+      hr
+      div.span4.well
+        h4 發送轉播請求
+        input#boardcast-name
+        button#boardcast.btn.btn-primary(style='margin-left:15px;') 送出
+      div.span12.well
+        table
+          thead
+            tr
+              th 轉播名稱
+              th *
+          tbody#boardcaster
+

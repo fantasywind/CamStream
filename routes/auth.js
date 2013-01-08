@@ -12,6 +12,7 @@ var sqlConn = mysql.createConnection({
 	database: 'cga_cam_stream'
 });
 var hashSalt = 'aEh%ew3#@as16';
+var clients = {};
 var dep = {0: {name: '未指定', master: null}};
 var listen = {};
 
@@ -169,24 +170,25 @@ function add_device(req, res){
 exports.listen = function (req, res) {
 	var passCode = req.params.pc,
 	    returnFn = function (req, res) {
-		return function (device) {
-			console.log('return Fn, device: ' + device );
-		    if (device) {
-		    	res.json({
-		    	    status: 'success',
-			    passCode: passCode,
-			    device: device
-			});
-		    } else {
-			res.jsget			    status: 'stay',
-			    passCode: passCode
-			});
-		    }
-		};
+		    return function (device) {
+          console.log('return Fn, device: ' + device );
+		      if (device) {
+		    	  res.json({
+             status: 'success',
+             passCode: passCode,
+             device: device
+            });
+          } else {
+			      res.json({
+              status: 'stay',
+			        passCode: passCode
+			      });
+		      }
+		    };
 	    },
 	    timeout = function () {
-		listen[passCode]();
-		delete listen[passCode];
+		    listen[passCode]();
+		    delete listen[passCode];
 	    };
 
 	listen[passCode] = returnFn(req, res);
@@ -228,6 +230,15 @@ exports.login = function (req, res) {
 				if (plusSalt == result.password){
 					req.session.role = result.role;
 					req.session.uid = result.id;
+          var test = true;
+          while (test) {
+            var sessionID = Math.floor(Math.random() * 100000);
+            if (!clients[sessionID]){
+              clients[sessionID] = result.id;
+              req.session.seid = sessionID;
+              test = false;
+            }
+          }
 					res.redirect('/');
 				} else
 				    res.render('login', {statusText: 'PasswordWrong'});
@@ -238,10 +249,34 @@ exports.login = function (req, res) {
 		render('login', {statusText: 'Login'});
 }
 
+exports.device_login = function (req, res) {
+  var token = req.body.token;
+  if (token){
+    sqlConn.query("SELECT `id` FROM `token` WHERE `token` = ?", token, function (err, rows, field) {
+      if (err) throw err;
+      console.dir(err);
+      if (rows.length){
+        req.session.token_id = token;
+        res.json({
+          status: 'logined'
+        });
+      } else {
+        res.json({
+          status: 'failed'
+        });
+      }
+    });
+  } else {
+    res.json({
+      status: 'no data'
+    });
+  }
+};
+
 exports.logout = function (req, res) {
 	delete req.session.role
 	res.redirect('/');
-}
+};
 
 exports.get = function (req, res) {
 	if (req.session.role == 'admin') {
@@ -253,3 +288,4 @@ exports.get = function (req, res) {
 		res.json(result);
 	}
 };
+

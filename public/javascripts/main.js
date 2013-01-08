@@ -6,6 +6,7 @@ $(function () {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	},
 	mapContainer = $("#map-container"),
+  source_selector = $("#source-selector"),
 	//map = new google.maps.Map(mapContainer[0], options);
   
 
@@ -114,10 +115,47 @@ $(function () {
 			})
 		}
 	});
+  
+  //  監聽視訊來源
+  function listen_source(first){
+    $.getJSON('/listen', {first: first}, function (json){
+      if (json.status == 'new_cam'){
+        var i, btn;
+
+        if (!source_selector.find('.btn').length){
+          source_selector.empty();
+        }
+
+        for (i in json.cams){
+          $(".live[target-id='" + json.cams[i].id + "']").remove();
+          btn = "<button class='live btn' target-id='" + json.cams[i].id + "'><i class='icon-facetime-video'></i> " + json.cams[i].name + "</button>";
+          source_selector.append(btn);
+        }
+      }
+      listen_source(false);
+    });
+  }
+  listen_source(true);
+
+  $("#source-selector").delegate('.live', 'click', function () {
+    var $this = $(this),
+        id = $this.attr('target-id');
+    $.ajax({
+      type: 'GET',
+      url: '/down/' + id,
+      dataType: 'json',
+      success: function (json){
+        jwplayer("p1").setup({
+          file: "./transfer/" + json.port,
+          type: "mp4"
+        });
+      }
+    });
+  });
 
   //  初始化播放器
-  jwplayer("p1").setup({
-    file: "./v/1",
-    type: "mp4"
-  });
+  //jwplayer("p1").setup({
+  //  file: "./v/1",
+  //  type: "mp4"
+  //});
 });
