@@ -15,18 +15,34 @@ html
         select#device-selector
           each device, i in devices
             option(value=devices[i].id, token=devices[i].token) #{devices[i].device}
-        div.btn-group
+        div#selector-controller.btn-group
+          button#binder.btn 新增裝置
           button#register.btn 綁定手機
       hr
       div.span4.well
         h4 發送轉播請求
         input#boardcast-name
         button#boardcast.btn.btn-primary(style='margin-left:15px;') 送出
-      div.span12.well
+      div.span4.well
         table
           thead
             tr
-              th 轉播名稱
-              th *
+              th(width='250px') 轉播名稱
+              th Port
           tbody#boardcaster
-
+    div#binder-modal.modal
+      div.modal-header
+        h3 新增裝置
+      div.modal-body
+        p#binder-status.alert
+        form
+          fieldset
+            p.binder-input
+              label 通行碼:   
+              input#passcode
+            p.binder-input
+              label 裝置名稱: 
+              input#device-name.input
+            p.binder-input
+              button#binder-submit.btn.btn-block.btn-primary 新增
+      div.modal-footer

@@ -46,7 +46,7 @@ function getTokens(req, res){
 			for (var i in rows){
 				users[rows[i].id] = rows[i].realname;  
 			}
-			sqlConn.query("SELECT `device`, `expired`, `maker_id`, `pass_code`, `dep_id` FROM `token` ORDER BY `expired` DESC", function (err, rows, fields){
+			sqlConn.query("SELECT `device`, `expired`, `maker_id`, `pass_code`, `dep_id` FROM `token` WHERE `available` = 1  ORDER BY `expired` DESC", function (err, rows, fields){
 				if (err) throw err;
 				var tokens = [];
 				for (var i in rows){
@@ -77,7 +77,7 @@ function deleteToken(req, res){
 		res.writeHead(401);
 		res.end();  
 	} else {
-		sqlConn.query("DELETE FROM `token` WHERE `pass_code` = ?", passCode, function (err, rows, field){
+		sqlConn.query("UPDATE `cga_cam_stream`.`token` SET `available` = 0 WHERE `pass_code` = ?", passCode, function (err, rows, field){
 			if (err) throw err;
 			res.json({
 				status: 'deleted'
@@ -147,7 +147,7 @@ function write_device_data (token, req, res) {
 function add_device(req, res){
 	var pass_code = req.params.pc;
 	try {
-		sqlConn.query("SELECT `token`, `id` FROM `token` WHERE `expired` is null AND `pass_code` = ?", pass_code, function (err, rows, field) {
+		sqlConn.query("SELECT `token`, `id` FROM `token` WHERE `available` = 1 AND `expired` is null AND `pass_code` = ?", pass_code, function (err, rows, field) {
 			if (err) throw err;
 			var result = {};
 			if (rows.length){
@@ -252,7 +252,7 @@ exports.login = function (req, res) {
 exports.device_login = function (req, res) {
   var token = req.body.token;
   if (token){
-    sqlConn.query("SELECT `id` FROM `token` WHERE `token` = ?", token, function (err, rows, field) {
+    sqlConn.query("SELECT `id` FROM `token` WHERE `available` = 1 AND `token` = ?", token, function (err, rows, field) {
       if (err) throw err;
       console.dir(err);
       if (rows.length){
@@ -278,14 +278,22 @@ exports.logout = function (req, res) {
 	res.redirect('/');
 };
 
+exports.check = function (req, res) {
+  sqlConn.query("SELECT `id` FROM `token` WHERE `available` = 1 AND `device` = ''", function (err, rows, field) {
+    console.dir(err);
+    if (rows.length){
+      res.json({
+        status: 'available'
+      });
+    } else {
+      res.json({
+        status: 'unavailable'
+      });
+    }
+  });
+}
+
 exports.get = function (req, res) {
-	if (req.session.role == 'admin') {
-		var result = getTokens(req, res);
-	} else {
-		var result = {
-			status: 'available'
-		};
-		res.json(result);
-	}
+	var result = getTokens(req, res);
 };
 

@@ -7,6 +7,7 @@ $(function () {
 	},
 	mapContainer = $("#map-container"),
   source_selector = $("#source-selector"),
+  playerList = {},
 	//map = new google.maps.Map(mapContainer[0], options);
   
 
@@ -131,6 +132,10 @@ $(function () {
           btn = "<button class='live btn' target-id='" + json.cams[i].id + "'><i class='icon-facetime-video'></i> " + json.cams[i].name + "</button>";
           source_selector.append(btn);
         }
+      } else if (json.status == 'cam_close'){
+         $(".live[target-id='" + json.cam_id + "']").fadeOut();
+         $("#" + playerList[json.cam_id]).remove();
+         $("#viewer-holder").show();
       }
       listen_source(false);
     });
@@ -145,9 +150,16 @@ $(function () {
       url: '/down/' + id,
       dataType: 'json',
       success: function (json){
-        jwplayer("p1").setup({
+        var playerID = 'p' + (playerList.length + 1);
+        playerList[id] = playerID;
+        $("<div>").attr('id', playerID).appendTo($("#viewer"));
+        $("#viewer-holder").hide();
+        jwplayer(playerID).setup({
           file: "./transfer/" + json.port,
-          type: "mp4"
+          type: "mp4",
+          autostart: true,
+          width: '100%',
+          height: 400
         });
       }
     });

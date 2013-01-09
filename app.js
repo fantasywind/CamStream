@@ -38,6 +38,7 @@ app.del('/auth/:pc', auth.deleteToken);
 app.get('/logout', auth.logout);
 app.get('/auth/listen/:pc', auth.listen);
 app.get('/auth/new', auth.newToken);
+app.get('/auth/check', auth.check);
 app.get('/auth', auth.get);
 app.get('/users', user.list);
 app.get('/transfer/:port', vs.transfer);

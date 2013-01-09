@@ -42,7 +42,7 @@ function cleaner () {
     }
   }
 }
-setInterval(cleaner, 600000);
+setInterval(cleaner, 60000);
 
 //  Client Connection Object - listen cams status
 
@@ -67,6 +67,16 @@ Client = function(req, res, serial){
     });
     clients[serial].finish = true;
   };
+  this.close_cam = function (id){
+    if (!clients[serial].finish){
+      clearTimeout(timeout);
+      res.json({
+        status: 'cam_close',
+        cam_id: id
+      });
+      clients[serial].finish = true;
+    }
+  }
   this.new_cam = function (token, notified, id, name, alias) {
     notified[req.session.seid] = true;
     clearTimeout(timeout);
@@ -150,7 +160,7 @@ Cam = function(req, res, token, name){
 
 //  Receiver
 
-Receiver = function (token_id, name){
+Receiver = function (token_id, name, listener){
   var random,
       exists,
       filename,
@@ -195,23 +205,33 @@ Receiver = function (token_id, name){
       fstream = fs.createWriteStream(PATH + filename);
       portToFile[listen_port] = PATH + filename;
       stream[listen_port] = [];
+
+      //  Notify Listener
+      listener.json({
+        status: 'online',
+        port: listen_port
+      });
+      
       console.log("\033[033m - Get connection on " + listen_port + "\033[039m");
     });
     
-    conn.on("data", function(chunk) {
+    conn.on("data", function (chunk) {
       this.status = "streaming";
       stream[listen_port].push(chunk);
       fstream.write(chunk);
     });
     
-    conn.on("end", function() {
+    conn.on("end", function () {
       this.status = "close";
-      console.log("\033[034Close Receiver: " + filename + " on port " + listen_port + "\033[039m");
+      console.log("\033[034mClose Receiver: " + filename + " on port " + listen_port + "\033[039m");
       fstream.end();
       fs.renameSync(PATH + filename, PATH + finalname);
       sqlConn.query("INSERT INTO `videos` (`token_id`, `filename`, `name`) VALUES ('" + token_id + "', '" + finalname + "', '" + name + "')", function (err, rows, field) {
         if (err) throw err;
       });
+      for (i in clients) {
+        clients[i].close_cam(token_id);
+      }
       delete ports[listen_port];
       vs.close();
     });
@@ -226,7 +246,7 @@ exports.listen_stream = function (req, res){
     try {
       var test = true,
           random;
-
+      console.dir(clients);
       while (test){
         random = Math.floor(Math.random() * 1000);
         if (!clients[random]){
@@ -271,12 +291,8 @@ exports.down_stream = function (req, res) {
       server;
 
   if (token){
-    server = new Receiver(id, cams[token].name);
+    server = new Receiver(id, cams[token].name, res);
     cams[token].success(server.port);
-    res.json({
-      status: 'online',
-      port: server.port
-    });
   } else {
     res.json({
       status: 'offline'

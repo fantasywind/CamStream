@@ -1,3 +1,10 @@
 #boardcaster .boardcast-name {
     font-size: 1.4em;
 }
+#selector-controller {
+    margin: 8px;
+    margin-bottom: 18px;
+}
+#binder-modal {
+    display:none;
+}

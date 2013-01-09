@@ -30,3 +30,18 @@ div#map-container {
 	text-align: right;
 	color: red;  
 }
+div#viewer-holder {
+    width:100%;
+    height:400px;
+    background:#ccc;
+    opacity:0.8;
+    font-size:1.8em;
+    color:#777;
+    text-align:center;
+    padding-top:160px;
+}
+#p1 {
+    display:none;
+    width: 100%;
+    min-height: 400px;
+}

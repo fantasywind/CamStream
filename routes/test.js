@@ -9,7 +9,7 @@ var mysql = require('mysql'),
 exports.main = function (req, res){
   var devices;
 
-  sqlConn.query("SELECT * FROM `token`", function (err, rows, field){
+  sqlConn.query("SELECT * FROM `token` WHERE available = 1 AND device != ''", function (err, rows, field){
     devices = rows;
 
     res.render('test', {devices: devices});
