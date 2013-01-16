@@ -1,11 +1,11 @@
 $(function () {
   // google map initialize
-	var options = {
-		center: new google.maps.LatLng(24.99074, 121.518962),
-		zoom: 16,
-		mapTypeId: google.maps.MapTypeId.ROADMAP
-	},
-	mapContainer = $("#map-container"),
+	//var options = {
+	//	center: new google.maps.LatLng(24.99074, 121.518962),
+	//	zoom: 16,
+	//	mapTypeId: google.maps.MapTypeId.ROADMAP
+	//},
+	var mapContainer = $("#map-container"),
   source_selector = $("#source-selector"),
   playerList = {},
 	//map = new google.maps.Map(mapContainer[0], options);
@@ -117,6 +117,7 @@ $(function () {
 		}
 	});
   
+  /*
   //  監聽視訊來源
   function listen_source(first){
     $.getJSON('/listen', {first: first}, function (json){
@@ -141,6 +142,19 @@ $(function () {
     });
   }
   listen_source(true);
+  */
+
+  function listen_source () {
+    $.getJSON('/viewer/listen', {}, function (json) {
+      if (json.statusText === 'timeout') {
+        listen_source();
+      } else {
+
+      }
+    });
+  }
+  // 開始監聽來源
+  listen_source();
 
   $("#source-selector").delegate('.live', 'click', function () {
     var $this = $(this),
