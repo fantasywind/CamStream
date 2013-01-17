@@ -17,7 +17,8 @@ xcuserdata
 .svn
 CVS
 
-videos/*
+./videos/*
+
 lib-cov
 *.seed
 *.log
