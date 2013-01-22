@@ -90,7 +90,7 @@ Mediator = function () {
    * @param {Node Response} res
    */
 
-  this.create_sender = function (token, name, res) {
+  /*this.create_sender = function (token, name, res) {
     var options = {};
 
     options.department_id = 0;
@@ -122,7 +122,32 @@ Mediator = function () {
         return false;
       }
     });
-  }
+  }*/
+
+  /**
+   * Listen Sender
+   */
+
+  this.sender_listener = net.createServer(function (conn) {
+    conn.on('connect', function () {
+      console.log("\033[034m偵測到新轉播要求!\033[039m");
+    });
+
+    conn.on('data', function (chunk) {
+      console.log('Load Data: ');
+      var buf = new Buffer(chunk);
+      console.log(buf.toString());
+      conn.write('port: 3615');
+      console.log('conn.write("port: 3615")');
+    });
+
+    conn.on('close', function () {
+      console.log('\033[032mSocket Close\033[039m');
+    });
+
+  }).listen(36152, function () {
+    console.log('\033[037m來源監聽器於 Port: 36152\033[039m');
+  });
 
   /**
    * 檢查 Port 佔用狀態
