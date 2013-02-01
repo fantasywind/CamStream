@@ -9,7 +9,8 @@ var fs = require('fs'),
 
 sqlConn = mysql.createConnection({
   user: 'cga',
-  password: '361520@orz'
+  password: '361520@orz',
+  database: 'cga_cam_stream'
 });
 
 /**
@@ -134,11 +135,34 @@ Mediator = function () {
     });
 
     conn.on('data', function (chunk) {
-      console.log('Load Data: ');
-      var buf = new Buffer(chunk);
-      console.log(buf.toString());
-      conn.write('port: 3615');
-      console.log('conn.write("port: 3615")');
+      var buf,
+          token,
+          sender,
+          options = {};
+      
+      buf = new Buffer(chunk);
+      token = buf.toString();
+
+      console.log("Use Token: " + token);
+      
+      sqlConn.query("SELECT `id` FROM `token` WHERE `available` = 1 AND `token` = ?", token, function (err, rows, field) {
+        if (err) throw err;
+        if (rows.length) {
+          options.department = '未指定';
+          options.department_id = 0;
+          options.token = token;
+          options.name = '未命名事件';
+          options.id = rows[0].id;
+          sender = new Sender(options);
+          senders.push(sender);
+          conn.write(sender.port + '\r\n');
+          console.log('\033[036mSender Port: ' + sender.port + '\033[039m');
+        } else {
+          conn.write('denied\r\n');
+          console.log('\033[032mReject token: ' + token + '\033[039m');
+        }
+        conn.end();
+      });
     });
 
     conn.on('close', function () {
@@ -385,7 +409,7 @@ function conn_viewer_listen (req, res) {
 function conn_sender (req, res) {
   var name = req.params.token,
       token = req.params.name;
-  mediator.create_sender(token, name, res);
+  mediator.sender_listener(token, name, res);
 }
 
 exports.viewer_listen = conn_viewer_listen;
