@@ -4,7 +4,6 @@
  */
 
 exports.index = function(req, res){
-	console.dir(req.session)
 	if (!req.session.role){
 		res.render('login', {statusText: 'Login'});
 	} else {
